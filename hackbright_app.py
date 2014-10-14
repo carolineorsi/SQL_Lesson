@@ -7,7 +7,10 @@ def get_student_by_github(github):
     query = """SELECT first_name, last_name, github FROM Students WHERE github = ?"""
     DB.execute(query, (github,))
     row = DB.fetchone()
-    print """\
+    if row is None:
+        print "Student is not in records."
+    else:
+        print """\
 Student: %s %s
 Github account: %s"""%(row[0], row[1], row[2])
 
@@ -26,7 +29,10 @@ def get_project_by_title(title):
     query = """SELECT title, description, max_grade FROM Projects WHERE title = ?"""
     DB.execute(query, (title,))
     row = DB.fetchone()
-    print """\
+    if row is None:
+        print "Project is not in records."
+    else:
+        print """\
 Title: %s 
 Description: %s
 Maximum Grade: %s"""%(row[0], row[1], row[2])
@@ -41,7 +47,10 @@ def get_grade_by_project(student, project):
     query = """SELECT student_github, project_title, grade FROM Grades WHERE project_title = ? AND student_github = ?"""
     DB.execute(query, (project, student))
     row = DB.fetchone()
-    print """\
+    if row is None:
+        print "There is no record of that project for that student."
+    else:
+        print """\
     Student: %s
     Project: %s
     Grade: %s"""%(row[0], row[1], row[2])
@@ -54,61 +63,73 @@ def assign_grade(student, project, grade):
 
 def get_grade_by_student(student):
     query = """SELECT student_github, project_title, grade FROM Grades WHERE student_github = ?"""
-    for row in DB.execute(query, (student,)):
-        print """\
-        Student: %s
-        Project: %s
-        Grade: %s"""%(row[0], row[1], row[2])
+    DB.execute(query, (student,))
+    if len(DB.fetchall()) == 0:
+        print "That student has no grades or is not in the records."
+    else:
+        for item in DB.fetchall():
+            print """\
+    Student: %s
+    Project: %s
+    Grade: %s"""%(item[0], item[1], item[2])
+
 
 
 def main():
     connect_to_db()
     command = None
-    len_args = {
-    "student": 1,
-    "new_student": 3,
-    "title": 1,
-    "new_project": 3,
-    "get_grade": 2,
-    "assign_grade": 3,
-    "all_grades": 1
+    dict_args = {
+    "student": (1, get_student_by_github),
+    "new_student": (3, make_new_student),
+    "title": (1, get_project_by_title),
+    "new_project": (3, make_new_project),
+    "get_grade": (2, get_grade_by_project),
+    "assign_grade": (3, assign_grade),
+    "all_grades": (1, get_grade_by_student),
     }
     while command != "quit":
         input_string = raw_input("HBA Database> ")
-        tokens = input_string.split()
+        tokens = input_string.split(", ")
         if len(tokens) == 0:
-            print "Enter help for information, or quit"
+            print "Please enter a command.  Enter help for information, or quit"
             continue
         command = tokens[0]
         args = tokens[1:]
 
-        if command == "student":
-            if len(args) < len_args[command]:#should think of efficient way to expand this to all commands
-                print "Enter help for information, or quit"
-                continue
-            get_student_by_github(*args) 
-        elif command == "new_student":
-            make_new_student(*args)
-        elif command == "title":
-            get_project_by_title(*args)
-        elif command == "new_project":
-            make_new_project(*args)
-        elif command == "get_grade":
-            get_grade_by_project(*args)
-        elif command == "assign_grade":
-            assign_grade(*args)
-        elif command == "all_grades":
-            get_grade_by_student(*args)
-        else:
-            print """Valid commands include: student, new_student, title, new_project, getgrade, assign_grade, all_grades\n
+        if command in dict_args:
+            if len(args) != dict_args[command][0]:#should think of efficient way to expand this to all commands
+                print "Invalid input. Enter help for information, or quit"
+            else:
+                dict_args[command][1](*args)
+
+        # if command == "student":
+            # if len(args) < dict_args[command][0]:#should think of efficient way to expand this to all commands
+            #     print "Enter help for information, or quit"
+            #     continue
+            #get_student_by_github(*args) 
+
+        # elif command == "new_student":
+        #     make_new_student(*args)
+        # elif command == "title":
+        #     get_project_by_title(*args)
+        # elif command == "new_project":
+        #     make_new_project(*args)
+        # elif command == "get_grade":
+        #     get_grade_by_project(*args)
+        # elif command == "assign_grade":
+        #     assign_grade(*args)
+        # elif command == "all_grades":
+        #     get_grade_by_student(*args)
+        elif command != "quit":
+            print """Valid commands: student, new_student, title, new_project, getgrade, assign_grade, all_grades\n
 Format for using each command is:\n
-To read about an existing student: student, [github username]\n
-To add a new student: new_student, [first name], [last name], [github username]\n
-To read about an existing project: title, [project name]\n
-To add a new project: new_project, [project name], [project description], [maximum grade]\n
-To get a student's grade from a project: get_grade, [github username], [project name]\n
-To assign a grade to a student: assign_grade, [github username], [project name], [project grade]\n
-To view all grades for a student: all_grades, [github username]"""
+Look up existing student: student, [github username]\n
+Add new student: new_student, [first name], [last name], [github username]\n
+Look up existing project: title, [project name]\n
+Add new project: new_project, [project name], [project description], [maximum grade]\n
+See student's grade from project: get_grade, [github username], [project name]\n
+Assign grade to student: assign_grade, [github username], [project name], [project grade]\n
+View all grades for student: all_grades, [github username]"""
 
     CONN.close()
 
