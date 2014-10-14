@@ -54,9 +54,7 @@ def assign_grade(student, project, grade):
 
 def get_grade_by_student(student):
     query = """SELECT student_github, project_title, grade FROM Grades WHERE student_github = ?"""
-    #DB.execute(query, (project, student))
     for row in DB.execute(query, (student,)):
-    #row = DB.fetchone()
         print """\
         Student: %s
         Project: %s
@@ -66,13 +64,28 @@ def get_grade_by_student(student):
 def main():
     connect_to_db()
     command = None
+    len_args = {
+    "student": 1,
+    "new_student": 3,
+    "title": 1,
+    "new_project": 3,
+    "get_grade": 2,
+    "assign_grade": 3,
+    "all_grades": 1
+    }
     while command != "quit":
         input_string = raw_input("HBA Database> ")
         tokens = input_string.split()
+        if len(tokens) == 0:
+            print "Enter help for information, or quit"
+            continue
         command = tokens[0]
         args = tokens[1:]
 
         if command == "student":
+            if len(args) < len_args[command]:#should think of efficient way to expand this to all commands
+                print "Enter help for information, or quit"
+                continue
             get_student_by_github(*args) 
         elif command == "new_student":
             make_new_student(*args)
@@ -80,12 +93,22 @@ def main():
             get_project_by_title(*args)
         elif command == "new_project":
             make_new_project(*args)
-        elif command == "getgrade":
+        elif command == "get_grade":
             get_grade_by_project(*args)
         elif command == "assign_grade":
             assign_grade(*args)
         elif command == "all_grades":
             get_grade_by_student(*args)
+        else:
+            print """Valid commands include: student, new_student, title, new_project, getgrade, assign_grade, all_grades\n
+Format for using each command is:\n
+To read about an existing student: student, [github username]\n
+To add a new student: new_student, [first name], [last name], [github username]\n
+To read about an existing project: title, [project name]\n
+To add a new project: new_project, [project name], [project description], [maximum grade]\n
+To get a student's grade from a project: get_grade, [github username], [project name]\n
+To assign a grade to a student: assign_grade, [github username], [project name], [project grade]\n
+To view all grades for a student: all_grades, [github username]"""
 
     CONN.close()
 
