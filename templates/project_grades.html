@@ -1,0 +1,10 @@
+<html>
+<body>
+    <h1>Student Grades for {{ project }}</h1>
+    <ul>
+        {% for grade in grades %}
+            <li><a href="http://localhost:5000/student?github={{ grade[0] }}">{{ grade[0] }}</a> received a grade of {{ grade[1] }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

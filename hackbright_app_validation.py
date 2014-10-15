@@ -10,7 +10,9 @@ def get_student_by_github(github):
     if row is None:
         print "Student is not in records."
     else:
-        return row
+        print """\
+Student: %s %s
+Github account: %s"""%(row[0], row[1], row[2])
 
 def connect_to_db():
     global DB, CONN
@@ -21,7 +23,7 @@ def make_new_student(first_name, last_name, github):
     query = """INSERT INTO Students VALUES (?, ?, ?)"""
     DB.execute(query, (first_name, last_name, github))
     CONN.commit()
-    return "Successfully added student: %s %s"%(first_name, last_name)
+    print "Successfully added student: %s %s"%(first_name, last_name)
 
 def get_project_by_title(title): 
     query = """SELECT title, description, max_grade FROM Projects WHERE title = ?"""
@@ -39,7 +41,7 @@ def make_new_project(title, description, max_grade):
     query = """INSERT INTO Projects (title, description, max_grade) VALUES (?, ?, ?)"""
     DB.execute(query, (title, description, max_grade))
     CONN.commit()
-    return "Successfully added project: %s" % title
+    print "Successfully added project: %s" % title
 
 def get_grade_by_project(student, project):
     query = """SELECT student_github, project_title, grade FROM Grades WHERE project_title = ? AND student_github = ?"""
@@ -53,11 +55,6 @@ def get_grade_by_project(student, project):
     Project: %s
     Grade: %s"""%(row[0], row[1], row[2])
 
-def list_students_by_project(project):
-    query = """SELECT student_github, grade FROM Grades WHERE project_title = ?"""
-    DB.execute(query, (project,))
-    return DB.fetchall()
-
 def assign_grade(student, project, grade):
     #come back to fix input validation
     # try int(grade):
@@ -68,20 +65,19 @@ def assign_grade(student, project, grade):
     query = """INSERT INTO Grades VALUES (?, ?, ?)"""
     DB.execute(query, (student, project, grade))
     CONN.commit()
-    return "Successfully added a grade for student %s, project %s" % (student, project)
+    print "Successfully added a grade for student %s, project %s" % (student, project)
 
 def get_grade_by_student(student):
     query = """SELECT student_github, project_title, grade FROM Grades WHERE student_github = ?"""
     DB.execute(query, (student,))
-    # if len(DB.fetchall()) == 0:
-    #     print "That student has no grades or is not in the records."
-    # else:
-    #     for item in DB.fetchall():
-    #         print """\
-    # Student: %s
-    # Project: %s
-    # Grade: %s"""%(item[0], item[1], item[2])
-    return DB.fetchall()
+    if len(DB.fetchall()) == 0:
+        print "That student has no grades or is not in the records."
+    else:
+        for item in DB.fetchall():
+            print """\
+    Student: %s
+    Project: %s
+    Grade: %s"""%(item[0], item[1], item[2])
 
 
 

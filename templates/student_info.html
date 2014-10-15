@@ -1,0 +1,12 @@
+<html>
+<body>
+    <h1>Student: {{first_name}} {{last_name}}</h1>
+    <h2>Github account: {{github}}</h2>
+
+    {% for project in projects %}
+        <ul>
+        <li>For <a href="http://localhost:5000/project_grades?project={{ project[1] }}">{{ project[1] }}</a>, received grade of {{ project[2] }}</li>
+        </ul>
+    {% endfor %}
+</body>
+</html>

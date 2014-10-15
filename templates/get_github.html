@@ -1,0 +1,50 @@
+<html>
+<body>
+    <h3>Look up a student record</h3>
+    <form action="/student">
+        <label for="github">Enter github id</label>
+        <input type="text" name="github" />
+        <input type="submit">
+    </form>
+
+    <h3>Add a new student</h3>
+    <form action="/new_student">
+        <label for="first_name">Enter first name</label>
+        <input type="text" name="first_name" /><br>
+        <label for="last_name">Enter last name</label>
+        <input type="text" name="last_name" /><br>
+        <label for="github">Enter github id</label>
+        <input type="text" name="github" /><br>
+        <input type="submit">
+    </form>
+    <br>
+    {{ add_student_successful }}
+
+    <h3>Add a new project</h3>
+    <form action="/new_project">
+        <label for="project_title">Enter project title</label>
+        <input type="text" name="project_title" /><br>
+        <label for="project_description">Enter project description</label>
+        <input type="text" name="project_description" /><br>
+        <label for="max_grade">Enter maximum grade possible</label>
+        <input type="text" name="max_grade" /><br>
+        <input type="submit">
+    </form>
+    <br>
+    {{ add_project_successful }}
+
+    <h3>Assign a grade to a student</h3>
+    <form action="/assign_grade">
+        <label for="github">Enter github id</label>
+        <input type="text" name="github" /><br>
+        <label for="project_title">Enter project title</label>
+        <input type="text" name="project_title" /><br>
+        <label for="grade">Enter grade</label>
+        <input type="text" name="grade" /><br>
+        <input type="submit">
+    </form>
+    <br>
+    {{ assign_grade_successful }}
+
+</body>
+</html>
